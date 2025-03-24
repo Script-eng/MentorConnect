@@ -77,14 +77,21 @@ MentorConnect/
    ```bash
    git clone
 
-🧑‍🏫 Instructor
-    •    Name: [Bolla Kolman]
-    •    GitLab Role: Reporter (project supervision)
+## 🧑‍🏫 Instructor
+**Name:** [Bolla Kolman]  
+**GitLab Role:** Reporter *(project supervision)*  
 
-👨‍💻 Contributors
-    •    [![Salah Ben Sarar](https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_23.png)](https://github.com/salahbensarar1)
-    •    [![Steve Lesalon](https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_23.png)](https://github.com/Script-eng)
+---
 
-📃 License
+## 👨‍💻 Contributors
 
-This project is for educational purposes only as part of the Developing Mobile Applications 2 course. All rights reserved to the authors.
+| [<img src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_23.png" width="60" alt="Salah Ben Sarar"/>](https://github.com/salahbensarar1) | [<img src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_23.png" width="60" alt="Steve Lesalon"/>](https://github.com/Script-eng) |
+|:---:|:---:|
+| **[Salah Ben Sarar](https://github.com/salahbensarar1)** | **[Steve Lesalon](https://github.com/Script-eng)** |
+
+---
+
+## 📃 License
+This project is for educational purposes only as part of the  
+**Developing Mobile Applications 2** course.  
+All rights reserved to the authors.
