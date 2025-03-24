@@ -78,12 +78,12 @@ MentorConnect/
    git clone
 
 🧑‍🏫 Instructor
-    •    Name: [Instructor’s Name]
+    •    Name: [Bolla Kolman]
     •    GitLab Role: Reporter (project supervision)
 
 👨‍💻 Contributors
-    •    [Your Name]
-    •    [Teammate’s Name]
+    •    [![Salah Ben Sarar](https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_23.png)](https://github.com/salahbensarar1)
+    •    [![Steve Lesalon](https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_23.png)](https://github.com/Script-eng)
 
 📃 License
 
