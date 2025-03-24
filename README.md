@@ -42,6 +42,9 @@ MentorConnect is an Android application designed to help new university students
 
 ## 📂 Project Structure
 
+
+<pre lang="markdown">
+```
 MentorConnect/
 ├── app/
 │   ├── src/
@@ -61,7 +64,12 @@ MentorConnect/
 │   │   │   └── AndroidManifest.xml
 ├── build.gradle
 ├── README.md
-└── .gitlab-ci.yml (if using CI/CD)
+└── .github/
+    └── workflows/                            # GitHub Actions for CI/CD
+        └── android-ci.yml
+```
+</pre>
+
 
 ## 🚀 Installation Guide
 
