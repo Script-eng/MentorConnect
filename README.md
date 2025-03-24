@@ -79,7 +79,7 @@ MentorConnect/
 
 ## 🧑‍🏫 Instructor
 **Name:** [Bolla Kolman]  
-**GitLab Role:** Reporter *(project supervision)*  
+**GitHub Role:** Reporter *(project supervision)*  
 
 ---
 
