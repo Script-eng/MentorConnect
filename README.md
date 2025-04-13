@@ -38,7 +38,7 @@ MentorConnect is an Android application designed to help new university students
 | Media Handling   | Glide                                        |
 | Navigation       | Bottom Navigation Bar / Navigation Drawer    |
 | Map Integration  | Google Maps API                              |
-| Version Control  | GitLab                                       |
+| Version Control  | GitHub                                       |
 
 ## 📂 Project Structure
 <pre lang="markdown">
@@ -71,7 +71,7 @@ MentorConnect/
 
 1. **Clone the repository**  
    ```bash
-   git clone
+   git clone https://github.com/Script-eng/MentorConnect.git
 
 🧑‍🏫 Instructor
 	•	Name: [Bola Kolman]
