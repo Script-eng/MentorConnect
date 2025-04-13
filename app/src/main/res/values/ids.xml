@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="nav_mentors" type="id" />
+    <item name="nav_chat" type="id" />
+    <item name="nav_map" type="id" />
+</resources>
