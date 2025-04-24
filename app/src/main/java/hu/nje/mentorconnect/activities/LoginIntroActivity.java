@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import hu.nje.mentorconnect.MainActivity;
@@ -13,33 +12,30 @@ import hu.nje.mentorconnect.R;
 
 public class LoginIntroActivity extends AppCompatActivity {
 
-    private Button signInButton, registerButton;
-    private TextView skipText;
+    Button btnSignIn, btnRegister;
+    TextView textSkip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_intro);
 
-        signInButton = findViewById(R.id.button_sign_in);
-        registerButton = findViewById(R.id.button_register);
-        skipText = findViewById(R.id.text_skip);
+        btnSignIn = findViewById(R.id.button_sign_in);
+        btnRegister = findViewById(R.id.button_register);
+        textSkip = findViewById(R.id.text_skip);
 
-        signInButton.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginIntroActivity.this, LoginActivity.class);
-            startActivity(intent);
+        btnSignIn.setOnClickListener(v -> {
+            startActivity(new Intent(this, LoginActivity.class));
         });
 
-        registerButton.setOnClickListener(v -> {
-            // For now, simulate a toast or redirect to LoginActivity as placeholder
-            Intent intent = new Intent(LoginIntroActivity.this, LoginActivity.class);
-            startActivity(intent);
+        btnRegister.setOnClickListener(v -> {
+            // Temporary: Use same Login screen
+            startActivity(new Intent(this, LoginActivity.class));
         });
 
-        skipText.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginIntroActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        textSkip.setOnClickListener(v -> {
+            startActivity(new Intent(this, MainActivity.class));
+            finish(); // prevent coming back to intro
         });
     }
 }
