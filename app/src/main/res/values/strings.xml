@@ -1,7 +1,28 @@
 <resources>
+<<<<<<< HEAD
     <string name="app_name">mentorConnect</string>
     <string-array name="roles_array">
         <item>Mentor</item>
         <item>Mentee</item>
     </string-array>
+=======
+        <string name="app_name">MentorConnect</string>
+        <string name="download_document">Download Document</string>
+        <string name="general_mentee_info_title">General Information for Mentees</string>
+        <string name="general_mentee_info_content">Welcome to the MentorConnect program! Here you can find useful documents. Use the download button to save them to your device. Reach out to your mentor or the program coordinator if you have any questions.</string>
+
+        <!-- Download Messages -->
+        <string name="download_started_toast">Download started: %s</string> <!-- %s for filename -->
+        <string name="download_failed_toast">Could not start download. Check URL and permissions.</string>
+        <string name="download_complete_toast">Download complete: %s</string>
+        <string name="download_failed_status_toast">Download failed: %s</string>
+        <string name="storage_permission_denied">Storage permission is required to download documents.</string>
+        <string name="no_network_connection">No network connection available.</string>
+        <string name="download_manager_disabled">DownloadManager is disabled on this device.</string>
+        <string name="error_opening_file">Could not open file. No application found.</string>
+        <string name="open_downloaded_file">Open File</string>
+
+        <!-- Add other strings as needed -->
+
+>>>>>>> 3967859c808a6e9d1d133d845c9722fb09db77ea
 </resources>
