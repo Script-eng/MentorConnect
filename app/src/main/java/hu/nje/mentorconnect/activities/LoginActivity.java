@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +25,8 @@ public class LoginActivity extends AppCompatActivity {
 
         emailInput = findViewById(R.id.email_input);
         passwordInput = findViewById(R.id.password_input);
-        signInButton = findViewById(R.id.login_button);
+        signInButton = findViewById(R.id.register_button);
+
 
         signInButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
@@ -43,6 +45,11 @@ public class LoginActivity extends AppCompatActivity {
             // If both fields are valid
             startActivity(new Intent(this, MainActivity.class));
             finish(); // Optional: prevent back to login
+        });
+
+        TextView textRegister = findViewById(R.id.text_register);
+        textRegister.setOnClickListener(v ->{
+            startActivity(new Intent(this, RegisterActivity.class));
         });
     }
 }

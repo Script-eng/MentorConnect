@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">mentorConnect</string>
+    <string-array name="roles_array">
+        <item>Mentor</item>
+        <item>Mentee</item>
+    </string-array>
 </resources>
