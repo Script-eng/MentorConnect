@@ -15,6 +15,11 @@
         <string name="error_opening_file">Could not open file. No application found.</string>
         <string name="open_downloaded_file">Open File</string>
 
+        <string name="navigate_button_text">Navigate</string>
+        <string name="favorite_added_toast">%s added to favorites</string>
+        <string name="favorite_removed_toast">%s removed from favorites</string>
+        <string name="no_navigation_app">No application found to handle navigation.</string>
+
         <!-- Add other strings as needed -->
 
 </resources>
