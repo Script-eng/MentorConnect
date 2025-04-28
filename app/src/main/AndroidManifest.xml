@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-<<<<<<< HEAD
     <uses-permission android:name="android.permission.INTERNET"/>
-=======
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
->>>>>>> 3967859c808a6e9d1d133d845c9722fb09db77ea
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -25,20 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".activities.RegisterActivity" />
         <activity android:name=".activities.MentorHomeActivity"/>
-=======
-        <receiver
-            android:name=".receivers.DownloadCompletionReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
-            </intent-filter>
-        </receiver>
->>>>>>> 3967859c808a6e9d1d133d845c9722fb09db77ea
     </application>
 
 </manifest>
