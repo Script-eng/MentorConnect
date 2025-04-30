@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@drawable/bonuspack_bubble"
+    android:minWidth="150dp">
+
+<TextView
+android:id="@+id/info_title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:textStyle="bold"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Location Title" />
+
+<TextView
+android:id="@+id/info_snippet"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="4dp"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Details / Hours" />
+
+<Button
+android:id="@+id/info_navigate_button"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_gravity="center_horizontal"
+android:layout_marginTop="8dp"
+android:text="@string/navigate_button_text"
+style="?android:attr/buttonStyleSmall"/>
+
+    </LinearLayout>
