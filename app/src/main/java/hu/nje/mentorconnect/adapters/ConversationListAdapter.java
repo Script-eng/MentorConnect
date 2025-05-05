@@ -7,33 +7,33 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
+// Using ChatPartner model now
 import java.util.List;
-import java.util.Locale;
 
 import hu.nje.mentorconnect.R;
-import hu.nje.mentorconnect.models.Conversation;
+import hu.nje.mentorconnect.models.ChatPartner; // Import the new model
 
 public class ConversationListAdapter extends RecyclerView.Adapter<ConversationListAdapter.ConversationViewHolder> {
 
-    private final List<Conversation> conversationList;
-    private final OnConversationClickListener clickListener;
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd", Locale.getDefault());
+    // Changed List type to ChatPartner
+    private final List<ChatPartner> chatPartnerList;
+    private final OnChatPartnerClickListener clickListener;
 
-    // Interface for handling clicks
-    public interface OnConversationClickListener {
-        void onConversationClick(Conversation conversation);
+    // Interface for handling clicks - renamed for clarity
+    public interface OnChatPartnerClickListener {
+        void onChatPartnerClick(ChatPartner chatPartner); // Passes ChatPartner object
     }
 
-    public ConversationListAdapter(List<Conversation> conversationList, OnConversationClickListener listener) {
-        this.conversationList = conversationList;
+    // Constructor takes List<ChatPartner> and the renamed listener interface
+    public ConversationListAdapter(List<ChatPartner> chatPartnerList, OnChatPartnerClickListener listener) {
+        this.chatPartnerList = chatPartnerList;
         this.clickListener = listener;
     }
 
     @NonNull
     @Override
     public ConversationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Still uses item_conversation layout, as it displays similar info (name)
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_conversation, parent, false);
         return new ConversationViewHolder(view);
@@ -41,62 +41,64 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
 
     @Override
     public void onBindViewHolder(@NonNull ConversationViewHolder holder, int position) {
-        Conversation conversation = conversationList.get(position);
-        holder.bind(conversation, clickListener, timeFormat, dateFormat);
+        ChatPartner chatPartner = chatPartnerList.get(position);
+        holder.bind(chatPartner, clickListener); // Pass ChatPartner to bind method
     }
 
     @Override
     public int getItemCount() {
-        return conversationList.size();
+        return chatPartnerList == null ? 0 : chatPartnerList.size();
     }
 
+    // --- ViewHolder ---
     static class ConversationViewHolder extends RecyclerView.ViewHolder {
+        // Views expected in item_conversation.xml
         TextView partnerNameText;
-        TextView lastMessageText;
-        TextView lastMessageTimeText;
+        TextView lastMessageText;       // We might hide or repurpose this
+        TextView lastMessageTimeText;   // We might hide or repurpose this
 
         ConversationViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Find views from item_conversation.xml
             partnerNameText = itemView.findViewById(R.id.partner_name_text);
             lastMessageText = itemView.findViewById(R.id.last_message_text);
             lastMessageTimeText = itemView.findViewById(R.id.last_message_time_text);
         }
 
-        void bind(final Conversation conversation, final OnConversationClickListener listener, SimpleDateFormat timeFormat, SimpleDateFormat dateFormat) {
-            partnerNameText.setText(conversation.getPartnerName() != null ? conversation.getPartnerName() : "Unknown User");
-            lastMessageText.setText(conversation.getLastMessageText() != null ? conversation.getLastMessageText() : "");
+        // Bind method now takes a ChatPartner object
+        void bind(final ChatPartner chatPartner, final OnChatPartnerClickListener listener) {
+            // Display the partner's name
+            partnerNameText.setText(chatPartner.getUserName() != null ? chatPartner.getUserName() : "Unknown User");
 
-            // Format the timestamp
-            if (conversation.getLastMessageTimestamp() != null) {
-                long timeMillis = conversation.getLastMessageTimestampMillis();
-                // Basic logic: Show time if today, show date if older
-                // You might want more sophisticated logic (yesterday, etc.)
-                if (isToday(timeMillis)) {
-                    lastMessageTimeText.setText(timeFormat.format(conversation.getLastMessageTimestamp().toDate()));
-                } else {
-                    lastMessageTimeText.setText(dateFormat.format(conversation.getLastMessageTimestamp().toDate()));
-                }
-            } else {
-                lastMessageTimeText.setText("");
-            }
+            // --- Decide what to do with the other TextViews ---
+            // Option A: Hide them if they are irrelevant now
+            if (lastMessageText != null) lastMessageText.setVisibility(View.GONE);
+            if (lastMessageTimeText != null) lastMessageTimeText.setVisibility(View.GONE);
+
+            // Option B: Repurpose them (e.g., show User Role if you add it to ChatPartner)
+            // if (lastMessageText != null && chatPartner.getUserRole() != null) {
+            //     lastMessageText.setVisibility(View.VISIBLE);
+            //     lastMessageText.setText(chatPartner.getUserRole());
+            // } else if (lastMessageText != null) {
+            //      lastMessageText.setVisibility(View.GONE);
+            // }
+            // if (lastMessageTimeText != null) lastMessageTimeText.setVisibility(View.GONE); // Hide time for now
 
             // Set click listener for the whole item view
-            itemView.setOnClickListener(v -> listener.onConversationClick(conversation));
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onChatPartnerClick(chatPartner); // Pass the clicked ChatPartner back
+                }
+            });
         }
+    } // --- End ViewHolder ---
 
-        // Helper to check if timestamp is today
-        private static boolean isToday(long timeMillis) {
-            long currentTime = System.currentTimeMillis();
-            // Basic check by comparing day, month, year
-            SimpleDateFormat dayFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-            return dayFormat.format(timeMillis).equals(dayFormat.format(currentTime));
+    // Helper method to update the list (now takes List<ChatPartner>)
+    public void updateChatPartners(List<ChatPartner> newChatPartners) {
+        this.chatPartnerList.clear();
+        if (newChatPartners != null) {
+            this.chatPartnerList.addAll(newChatPartners);
         }
-    }
-
-    // Helper method to update the entire list
-    public void updateConversations(List<Conversation> newConversations) {
-        this.conversationList.clear();
-        this.conversationList.addAll(newConversations);
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // Use DiffUtil for better performance later
     }
 }

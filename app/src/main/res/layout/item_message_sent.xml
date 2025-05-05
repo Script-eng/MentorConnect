@@ -13,18 +13,16 @@
 
 <TextView
 android:id="@+id/message_text_sent"
-android:layout_width="wrap_content"
+android:layout_width="0dp"
 android:layout_height="wrap_content"
 android:background="@drawable/bg_message_sent"
-    android:padding="10dp"
-    android:textColor="@android:color/white"
-    android:text="This is my message sent."
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintWidth_max="wrap_content_constrained" />
+android:padding="10dp"
+android:textColor="@android:color/white"
+app:layout_constrainedWidth="true"
+app:layout_constraintTop_toTopOf="parent"
+app:layout_constraintEnd_toEndOf="parent"
+tools:text="This is my message sent very very very very very very very very very very very very very very long message to test wrapping."/>
 
-
-    <!-- Optional: Timestamp below message -->
 <TextView
 android:id="@+id/timestamp_text_sent"
 android:layout_width="wrap_content"

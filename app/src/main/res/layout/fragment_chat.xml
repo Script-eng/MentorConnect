@@ -5,27 +5,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ChatFragment"> <!-- Updated context if needed -->
+    tools:context=".fragments.ChatFragment">
 
     <!-- Title (Could be updated dynamically based on state) -->
     <TextView
         android:id="@+id/chatTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chats"
+        android:text="@string/chat_title_list"
     android:textSize="24sp"
     android:textStyle="bold"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
-    android:layout_marginTop="16dp"/> <!-- Adjusted margin -->
+    android:layout_marginTop="16dp"/>
 
-    <!-- RecyclerView for Conversation List (Initially VISIBLE) -->
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewConversations"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="visible"
+        android:id="@+id/recyclerViewUsers"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:visibility="visible"
     android:padding="8dp"
     app:layout_constraintTop_toBottomOf="@id/chatTitle"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +33,21 @@
     app:layout_constraintEnd_toEndOf="parent"
     tools:listitem="@layout/item_conversation"/>
 
-    <!-- Container for the Message View (Initially GONE) -->
+
+    <TextView android:id="@+id/empty_list_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="No assigned users found."
+    android:textSize="16sp"
+    android:textColor="?android:attr/textColorSecondary"
+    android:visibility="gone"
+    app:layout_constraintTop_toBottomOf="@id/chatTitle"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="32dp"/>
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/messageViewContainer"
         android:layout_width="0dp"
@@ -54,7 +68,7 @@
         app:layout_constraintBottom_toTopOf="@id/inputLayoutContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_message_received"/> <!-- Add tools:listitem -->
+        tools:listitem="@layout/item_message_received"/> <!-- Example item -->
 
     <!-- Container for input elements -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -78,10 +92,10 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:background="@android:drawable/editbox_background"
-        android:padding="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/sendButton"/>
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/sendButton"/>
 
         <!-- Send Button -->
         <ImageButton
@@ -92,12 +106,12 @@
             android:contentDescription="Send"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:tint="?attr/colorPrimary"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="@id/messageInput"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/messageInput"
-        />
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/messageInput"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/messageInput"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

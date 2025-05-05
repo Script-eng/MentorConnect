@@ -11,41 +11,27 @@
     android:paddingEnd="64dp">
 
 
-    <!-- Optional: Sender Name (only show if different from previous?) -->
-    <!-- <TextView
-        android:id="@+id/sender_text_received"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        tools:text="Mentor Name"
-        android:layout_marginStart="10dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" /> -->
-
-    <!-- Message Content Bubble -->
 <TextView
 android:id="@+id/message_text_received"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:background="@drawable/bg_message_received"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_message_received"
     android:padding="10dp"
     android:textColor="?android:attr/textColorPrimary"
-    android:text="This is their message received."
+    app:layout_constrainedWidth="true"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintWidth_max="wrap_content_constrained" />
+    tools:text="This is their message received very very very very very very very very very very very very very very long message to test wrapping."/>
 
-    >
+
 <TextView
 android:id="@+id/timestamp_text_received"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:textSize="10sp"
-tools:text="10:31 AM"
-android:layout_marginTop="2dp"
-app:layout_constraintTop_toBottomOf="@id/message_text_received"
-app:layout_constraintStart_toStartOf="@id/message_text_received" />
-
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="10sp"
+    tools:text="10:31 AM"
+    android:layout_marginTop="2dp"
+    app:layout_constraintTop_toBottomOf="@id/message_text_received"
+    app:layout_constraintStart_toStartOf="@id/message_text_received" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
