@@ -17,12 +17,10 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
     private OnDownloadClickListener downloadClickListener;
 
     // Interface for handling download clicks (implemented by DocsFragment)
-    public interface OnDownloadClickListener {
-        void onDownloadClick(Document document);
-    }
 
     // Constructor
-    public DocumentAdapter(List<Document> documentList, OnDownloadClickListener listener) {
+    public DocumentAdapter(List<Document> documentList,
+                           OnDownloadClickListener listener) {
         this.documentList = documentList;
         this.downloadClickListener = listener;
     }
@@ -43,7 +41,6 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
 
         // Bind data to the views in the ViewHolder
         holder.titleTextView.setText(document.getTitle());
-        holder.descriptionTextView.setText(document.getDescription());
 
         // Set the click listener for the download button
         holder.downloadButton.setOnClickListener(v -> {
@@ -63,14 +60,11 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
     // ViewHolder class holding the views for each item
     static class DocumentViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView;
-        TextView descriptionTextView;
         ImageButton downloadButton;
 
         DocumentViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Find the views within the item layout
             titleTextView = itemView.findViewById(R.id.document_title_text);
-            descriptionTextView = itemView.findViewById(R.id.document_description_text);
             downloadButton = itemView.findViewById(R.id.download_button);
         }
     }
@@ -83,4 +77,15 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
         }
         notifyDataSetChanged(); // Notify the adapter that the data set has changed
     }
+
+
+
+    public interface OnDownloadClickListener {
+        void onDownloadClick(Document document);
+    }
+
+
+
+
+
 }

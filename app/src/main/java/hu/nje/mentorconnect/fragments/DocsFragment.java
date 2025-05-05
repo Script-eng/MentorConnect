@@ -1,26 +1,24 @@
 package hu.nje.mentorconnect.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -28,49 +26,57 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import hu.nje.mentorconnect.R;
 import hu.nje.mentorconnect.adapters.DocumentAdapter;
 import hu.nje.mentorconnect.models.Document;
 
+
 public class DocsFragment extends Fragment implements DocumentAdapter.OnDownloadClickListener {
 
+
+    private static final int REQUEST_WRITE_STORAGE = 1001;
+    private Document pendingDocument;
     private static final String TAG = "DocsFragment";
+    private static final int PICK_FILE_REQUEST = 100;
 
     private RecyclerView documentsRecyclerView;
     private DocumentAdapter documentAdapter;
     private List<Document> documentList;
     private TextView generalInfoTextView;
-    private Document pendingDownloadDocument = null;
+    private Button uploadButton;
+    private Uri selectedFileUri;
 
-    // To keep track of downloads initiated by this fragment session (optional but good practice)
-    // Map<DownloadId, Filename>
-    private final Map<Long, String> activeDownloads = new HashMap<>();
+    private FirebaseFirestore db;
+    private FirebaseUser currentUser;
+    private EditText documentTitleInput;
 
-
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    Log.d(TAG, "WRITE_EXTERNAL_STORAGE permission granted.");
-                    if (pendingDownloadDocument != null) {
-                        startDownload(pendingDownloadDocument);
-                    }
-                } else {
-                    Log.w(TAG, "WRITE_EXTERNAL_STORAGE permission denied.");
-                    Toast.makeText(getContext(), R.string.storage_permission_denied, Toast.LENGTH_LONG).show();
-                }
-                pendingDownloadDocument = null; // Clear pending request regardless of outcome
-            });
-
-    public DocsFragment() { }
+    public DocsFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.fragment_documents, container, false);
     }
 
@@ -80,6 +86,9 @@ public class DocsFragment extends Fragment implements DocumentAdapter.OnDownload
 
         documentsRecyclerView = view.findViewById(R.id.documents_recycler_view);
         generalInfoTextView = view.findViewById(R.id.general_info_text);
+        uploadButton = view.findViewById(R.id.upload_button);
+        uploadButton.setVisibility(View.GONE);
+        documentTitleInput = view.findViewById(R.id.document_title_input);
 
         documentList = new ArrayList<>();
         documentAdapter = new DocumentAdapter(documentList, this);
@@ -87,206 +96,271 @@ public class DocsFragment extends Fragment implements DocumentAdapter.OnDownload
         documentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         documentsRecyclerView.setAdapter(documentAdapter);
 
+        db = FirebaseFirestore.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            db.collection("users").document(currentUser.getUid()).get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists() && "Mentor".equalsIgnoreCase(doc.getString("role"))) {
+                            uploadButton.setVisibility(View.VISIBLE);
+                            uploadButton.setOnClickListener(v -> openFilePicker());
+                        }
+                    });
+        }
+
         loadDocuments();
+    }
+
+    private void openFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Document"), PICK_FILE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_FILE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            selectedFileUri = data.getData();
+            if (selectedFileUri != null) {
+                uploadFileToCloudinary(selectedFileUri);
+            }
+        }
+    }
+
+    private void uploadFileToCloudinary(Uri fileUri) {
+        new Thread(() -> {
+            try {
+                String cloudName = "dycj9nypi";
+                String apiKey    = "614464381627815";
+                String apiSecret = "IxPlqSEmP_A6JyuP0ZgN4yoyciU";
+                String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+
+                // 1) Read entire file
+                InputStream is = requireActivity()
+                        .getContentResolver()
+                        .openInputStream(fileUri);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = is.read(buf)) != -1) {
+                    baos.write(buf, 0, len);
+                }
+                baos.flush();
+                byte[] fileBytes = baos.toByteArray();
+                is.close();
+                baos.close();
+
+                // 2) Build signature
+                String signature = sha1("timestamp=" + timestamp + apiSecret);
+
+                // 3) Point at the raw endpoint
+                URL url = new URL(
+                        "https://api.cloudinary.com/v1_1/"
+                                + cloudName
+                                + "/raw/upload"
+                );
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                String boundary = "----" + System.currentTimeMillis();
+                conn.setRequestProperty(
+                        "Content-Type",
+                        "multipart/form-data; boundary=" + boundary
+                );
+
+                DataOutputStream dos =
+                        new DataOutputStream(conn.getOutputStream());
+                // form fields
+                writeFormField(dos, boundary, "api_key", apiKey);
+                writeFormField(dos, boundary, "timestamp", timestamp);
+                writeFormField(dos, boundary, "signature", signature);
+                writeFormField(dos, boundary, "resource_type", "raw");
+                // file field
+                writeFileField(dos, boundary, "file",
+                        "upload.pdf", fileBytes);
+
+                dos.writeBytes("--" + boundary + "--\r\n");
+                dos.flush();
+                dos.close();
+
+                // 4) Parse response
+                InputStream resp = conn.getInputStream();
+                String json = new BufferedReader(new InputStreamReader(resp))
+                        .lines()
+                        .collect(Collectors.joining("\n"));
+                JSONObject o = new JSONObject(json);
+                String fileUrl  = o.getString("secure_url");
+                String publicId = o.getString("public_id");
+                Log.d(TAG, "Upload complete. RAW URL: " + fileUrl);
+
+                saveToFirestore(fileUrl, publicId);
+            } catch (Exception e) {
+                Log.e(TAG, "Upload failed", e);
+            }
+        }).start();
+    }
+
+    private void saveToFirestore(String fileUrl, String publicId) {
+        if (currentUser == null) return;
+
+        Log.d(TAG, "Saving fileUrl=" + fileUrl);  // this will be a raw/upload URL now
+
+        String customTitle = documentTitleInput.getText().toString().trim();
+        if (customTitle.isEmpty()) customTitle = "Untitled Document";
+
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("title", customTitle);
+        docData.put("mentorId", currentUser.getUid());
+        docData.put("fileUrl", fileUrl);      // no replace needed
+        docData.put("publicId", publicId);
+        docData.put("timestamp", System.currentTimeMillis());
+
+        db.collection("documents")
+                .add(docData)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "Document uploaded and saved: " + documentReference.getId());
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Upload successful!", Toast.LENGTH_SHORT).show();
+                        documentTitleInput.setText("");
+                        loadDocuments();
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to save document metadata", e);
+                    Toast.makeText(getContext(), "Failed to save document", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void writeFormField(DataOutputStream dos, String boundary, String name, String value) throws Exception {
+        dos.writeBytes("--" + boundary + "\r\n");
+        dos.writeBytes("Content-Disposition: form-data; name=\"" + name + "\"\r\n\r\n");
+        dos.writeBytes(value + "\r\n");
+    }
+
+    private void writeFileField(DataOutputStream dos, String boundary, String name, String fileName, byte[] data) throws Exception {
+        dos.writeBytes("--" + boundary + "\r\n");
+        dos.writeBytes("Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + fileName + "\"\r\n");
+        dos.writeBytes("Content-Type: application/octet-stream\r\n\r\n");
+        dos.write(data);
+        dos.writeBytes("\r\n");
+    }
+
+    private String sha1(String input) throws Exception {
+        MessageDigest mDigest = MessageDigest.getInstance("SHA-1");
+        byte[] result = mDigest.digest(input.getBytes());
+        StringBuilder sb = new StringBuilder();
+        for (byte b : result) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 
     private void loadDocuments() {
         documentList.clear();
-        // Sample Data - Replace with your actual data source
-        documentList.add(new Document("Mentoring Handbook", "Guidelines and best practices.", "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"));
-        documentList.add(new Document("Program Schedule", "Timeline of key events.", "https://www.clickdimensions.com/links/TestPDFfile.pdf"));
-        documentList.add(new Document("Contact List", "Important contact information.", "https://www.africau.edu/images/default/sample.pdf"));
-        documentList.add(new Document("Feedback Form", "Template for feedback.", "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"));
-        documentAdapter.notifyDataSetChanged();
+
+        db.collection("documents")
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String title = doc.getString("title");
+                        String fileUrl = doc.getString("fileUrl");
+
+                        documentList.add(new Document(title, "", fileUrl));
+                    }
+                    documentAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to load documents from Firestore", e);
+                    Toast.makeText(getContext(), "Failed to load documents", Toast.LENGTH_SHORT).show();
+                });
     }
+
+
+
+    //Download from URL Part
 
     @Override
     public void onDownloadClick(Document document) {
-        Log.i(TAG, "Download requested for: " + document.getTitle());
+        String originalUrl = document.getDownloadUrl();  // e.g. …/image/upload/...pdf
+        Log.d(TAG, "Download URL: " + originalUrl);
 
-        if (!isNetworkAvailable()) {
-            Toast.makeText(getContext(), R.string.no_network_connection, Toast.LENGTH_SHORT).show();
+        if (originalUrl == null || originalUrl.isEmpty()) {
+
+            Toast.makeText(getContext(), "No file to download", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (!isDownloadManagerEnabled()) {
-            Toast.makeText(getContext(), R.string.download_manager_disabled, Toast.LENGTH_LONG).show();
-            // Optional: Intent to open download manager settings
-            // try {
-            //    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            //    intent.setData(Uri.parse("package:com.android.providers.downloads"));
-            //    startActivity(intent);
-            // } catch (Exception e) { Log.e(TAG, "Could not open DM settings", e); }
+        // On Android ≤ P (API <29), we need WRITE_EXTERNAL_STORAGE
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+                && ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            pendingDocument = document;
+            requestPermissions(
+                    new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                    REQUEST_WRITE_STORAGE
+            );
             return;
         }
 
-        pendingDownloadDocument = document;
-        checkPermissionAndDownload();
+        // Permission already granted (or Android 10+): start the download
+        startDownload(originalUrl, document.getTitle());
     }
-
-    private boolean isNetworkAvailable() {
-        if (getContext() == null) return false;
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-        }
-        return false;
-    }
-
-    private boolean isDownloadManagerEnabled() {
-        if (getContext() == null) return false;
-        try {
-            int state = getContext().getPackageManager().getApplicationEnabledSetting("com.android.providers.downloads");
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) { // Constants changed slightly in API 19
-                return !(state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
-                        state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER ||
-                        state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED);
-            } else {
-                return !(state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
-                        state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error checking DownloadManager state", e);
-            return false; // Assume disabled if check fails
-        }
-    }
-
-    private void checkPermissionAndDownload() {
-        if (pendingDownloadDocument == null || getContext() == null) {
-            Log.w(TAG, "checkPermissionAndDownload called with null document or context.");
-            return;
-        }
-
-        // Permission needed only for API <= 28
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Storage permission already granted (API <= 28).");
-                startDownload(pendingDownloadDocument);
-                pendingDownloadDocument = null;
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                Log.w(TAG, "Storage permission rationale should be shown (API <= 28).");
-                // Explain why you need the permission (e.g., in a dialog) then launch request.
-                // For simplicity here, we just request directly.
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-            else {
-                Log.d(TAG, "Requesting storage permission (API <= 28).");
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-        } else {
-            // No explicit storage permission needed for DownloadManager on API 29+ to public Downloads dir
-            Log.d(TAG, "No explicit storage permission needed for DownloadManager (API 29+).");
-            startDownload(pendingDownloadDocument);
-            pendingDownloadDocument = null;
-        }
-    }
-
-
-    private void startDownload(Document document) {
-        if (document.getDownloadUrl() == null || document.getDownloadUrl().isEmpty() || getContext() == null) {
-            Toast.makeText(getContext(), R.string.download_failed_toast, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "startDownload failed: Invalid URL or null context.");
-            return;
-        }
-
-        DownloadManager downloadManager = (DownloadManager) requireActivity().getSystemService(Context.DOWNLOAD_SERVICE);
-        if (downloadManager == null) {
-            Toast.makeText(getContext(), R.string.download_failed_toast, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "startDownload failed: DownloadManager service not found.");
-            return;
-        }
-
-        try {
-            Uri uri = Uri.parse(document.getDownloadUrl());
-            String fileName = extractFileName(uri, document.getTitle());
-
-            DownloadManager.Request request = new DownloadManager.Request(uri);
-            request.setTitle(document.getTitle());
-            request.setDescription("Downloading document...");
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-            // Mime type can be helpful but often handled automatically
-            // request.setMimeType(getMimeType(document.getDownloadUrl()));
-
-
-            long downloadId = downloadManager.enqueue(request);
-            activeDownloads.put(downloadId, fileName); // Store the download reference
-
-            Toast.makeText(getContext(), getString(R.string.download_started_toast, fileName), Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "Download enqueued. ID: " + downloadId + ", Filename: " + fileName + ", URL: " + document.getDownloadUrl());
-
-        } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Error starting download: Invalid URI? " + document.getDownloadUrl(), e);
-            Toast.makeText(getContext(), "Download failed: Invalid URL", Toast.LENGTH_SHORT).show();
-        }
-        catch (Exception e) {
-            Log.e(TAG, "Error starting download for " + document.getTitle(), e);
-            Toast.makeText(getContext(), R.string.download_failed_toast, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private String extractFileName(Uri uri, String fallbackTitle) {
-        String result = null;
-        try {
-            if (uri != null && "content".equals(uri.getScheme())) {
-                // Try to query content resolver if needed (not typical for DownloadManager source URIs)
-            } else if (uri != null) {
-                result = uri.getLastPathSegment();
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Error parsing URI for filename: " + uri, e);
-        }
-
-
-        if (result == null || result.isEmpty() || result.contains("=") || result.contains("?")) { // Basic check for invalid segment
-            // Sanitize fallback title and add a common extension (heuristic)
-            String sanitizedTitle = fallbackTitle.replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll("_+", "_");
-            String extension = ".pdf"; // Default assumption
-            if (uri != null && uri.getPath() != null) {
-                String path = uri.getPath().toLowerCase();
-                if (path.endsWith(".docx")) extension = ".docx";
-                else if (path.endsWith(".xlsx")) extension = ".xlsx";
-                else if (path.endsWith(".pptx")) extension = ".pptx";
-                else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) extension = ".jpg";
-                else if (path.endsWith(".png")) extension = ".png";
-                else if (path.endsWith(".txt")) extension = ".txt";
-            }
-            result = sanitizedTitle + extension;
-            Log.d(TAG, "Using fallback filename generation: " + result);
-        } else {
-            Log.d(TAG, "Extracted filename from URI: " + result);
-        }
-
-        // Ensure filename is not excessively long (optional filesystem safeguard)
-        if (result.length() > 100) {
-            result = result.substring(result.length() - 100);
-            Log.w(TAG, "Truncated long filename to: " + result);
-        }
-
-        return result;
-    }
-
-    // Optional: Helper to guess MIME type (can be inaccurate)
-     /*
-     private String getMimeType(String url) {
-         String type = null;
-         String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-         if (extension != null) {
-             type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
-         }
-         Log.d(TAG, "Guessed MIME type for " + url + ": " + type);
-         return type;
-     }
-     */
-
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Clean up references if needed, though downloads continue in background
-        activeDownloads.clear();
-        Log.d(TAG, "onDestroyView: Cleared active download references.");
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_WRITE_STORAGE
+                && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // retry download
+            onDownloadClick(pendingDocument);
+        } else {
+            Toast.makeText(getContext(),
+                    "Storage permission denied", Toast.LENGTH_SHORT).show();
+        }
     }
+    private void startDownload(String url, String title) {
+        String fileName = title;
+        if (fileName == null || fileName.isEmpty()) {
+            fileName = Uri.parse(url).getLastPathSegment();
+        }
+
+        DownloadManager.Request request =
+                new DownloadManager.Request(Uri.parse(url))
+                        .setTitle("Downloading " + fileName)
+                        .setDescription("Please wait…")
+                        .setNotificationVisibility(
+                                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                        )
+                        .setAllowedOverMetered(true)
+                        .setAllowedOverRoaming(true)
+                        .setDestinationInExternalPublicDir(
+                                Environment.DIRECTORY_DOWNLOADS,
+                                fileName
+                        );
+
+        DownloadManager dm = (DownloadManager)
+                requireContext().getSystemService(Context.DOWNLOAD_SERVICE);
+        if (dm != null) {
+            dm.enqueue(request);
+            Toast.makeText(getContext(),
+                    "Download started", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(),
+                    "Download manager unavailable", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    //END Download from URL Part
+
+
 }
+
