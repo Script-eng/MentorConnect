@@ -484,10 +484,10 @@ public class ChatFragment extends Fragment implements ConversationListAdapter.On
                     if (mentorDoc != null && mentorDoc.exists()) {
                         // *** Adapt based on YOUR Firestore structure ***
                         // Option A: If using List<String> assignedMenteeIds
-                        List<String> menteeIds = (List<String>) mentorDoc.get("assignedMenteeIds");
+                        //List<String> menteeIds = (List<String>) mentorDoc.get("assignedMenteeIds");
 
                         // Option B: If using List<Map<String, Object>> mentees (with 'uid' inside each map)
-                     /*
+
                      List<Map<String, Object>> menteeMaps = (List<Map<String, Object>>) mentorDoc.get("mentees");
                      List<String> menteeIds = new ArrayList<>();
                      if (menteeMaps != null) {
@@ -497,7 +497,7 @@ public class ChatFragment extends Fragment implements ConversationListAdapter.On
                              }
                          }
                      }
-                     */
+
                         // *** End Adaptation ***
 
                         if (menteeIds != null && !menteeIds.isEmpty()) {
