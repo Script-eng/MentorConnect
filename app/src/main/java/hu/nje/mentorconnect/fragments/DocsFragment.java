@@ -1,6 +1,7 @@
 package hu.nje.mentorconnect.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -52,7 +53,9 @@ import hu.nje.mentorconnect.adapters.DocumentAdapter;
 import hu.nje.mentorconnect.models.Document;
 
 
-public class DocsFragment extends Fragment implements DocumentAdapter.OnDownloadClickListener {
+public class DocsFragment extends Fragment
+        implements DocumentAdapter.OnDownloadClickListener,
+        DocumentAdapter.OnDeleteClickListener {
 
 
     private static final int REQUEST_WRITE_STORAGE = 1001;
@@ -91,7 +94,11 @@ public class DocsFragment extends Fragment implements DocumentAdapter.OnDownload
         documentTitleInput = view.findViewById(R.id.document_title_input);
 
         documentList = new ArrayList<>();
-        documentAdapter = new DocumentAdapter(documentList, this);
+        documentAdapter = new DocumentAdapter(
+                documentList,
+                this,
+                this);
+        documentsRecyclerView.setAdapter(documentAdapter);
 
         documentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         documentsRecyclerView.setAdapter(documentAdapter);
@@ -266,10 +273,11 @@ public class DocsFragment extends Fragment implements DocumentAdapter.OnDownload
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String id      = doc.getId();
                         String title = doc.getString("title");
                         String fileUrl = doc.getString("fileUrl");
 
-                        documentList.add(new Document(title, "", fileUrl));
+                        documentList.add(new Document(id, title, "", fileUrl));
                     }
                     documentAdapter.notifyDataSetChanged();
                 })
@@ -357,9 +365,28 @@ public class DocsFragment extends Fragment implements DocumentAdapter.OnDownload
                     "Download manager unavailable", Toast.LENGTH_SHORT).show();
         }
     }
-
-
     //END Download from URL Part
+    @Override
+    public void onDeleteClick(Document document) {
+        db.collection("documents")
+                .document(document.getId())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    documentList.remove(document);
+                    documentAdapter.notifyDataSetChanged();
+                    Toast.makeText(getContext(),
+                            "Document deleted",
+                            Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(),
+                            "Delete failed: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                });
+    }
+
+
+
 
 
 }
