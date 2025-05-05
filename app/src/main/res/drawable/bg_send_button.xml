@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval"> <!-- Make it a circle -->
+    <solid android:color="@color/chat_background_purple" /> <!-- Use main background color -->
+</shape>

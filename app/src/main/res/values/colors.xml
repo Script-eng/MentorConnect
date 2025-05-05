@@ -5,4 +5,13 @@
     <color name="lightPurple">#9FB3DF</color>
     <color name="lightBlue">#9EC6F3</color>
     <color name="lightBeige">#FFF1D5</color>
+    <color name="chat_background_purple">#6A5AE0</color> <!-- Vibrant Purple/Blue -->
+    <color name="chat_sent_bubble">#7B6EF0</color>   <!-- Slightly lighter shade for sent (optional, could use chat_background_purple) -->
+    <color name="chat_received_bubble">#FFFFFFFF</color> <!-- White -->
+    <color name="chat_sent_text">#FFFFFFFF</color>      <!-- White text for sent -->
+    <color name="chat_received_text">#FF333333</color> <!-- Dark Grey/Near Black for received -->
+    <color name="chat_timestamp_sent">#B3FFFFFF</color> <!-- White with ~70% alpha -->
+    <color name="chat_timestamp_received">#8A000000</color><!-- Dark Grey with ~54% alpha -->
+    <color name="chat_input_background">#FFFFFFFF</color> <!-- White input field -->
+    <color name="chat_input_hint">#999999</color>
 </resources>
