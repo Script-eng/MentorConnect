@@ -197,6 +197,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         Map<String, Object> newMentee = new HashMap<>();
                                         newMentee.put("name", name);
                                         newMentee.put("email", email);
+                                        newMentee.put("uid", uid);
 
                                         db.collection("users")
                                                 .document(selectedMentorUID)
