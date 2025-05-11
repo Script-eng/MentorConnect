@@ -2,16 +2,22 @@ package hu.nje.mentorconnect.models;
 
 public class Mentor {
     private String name;
-    private String major;
-    private int imageResId;
+    private String department;
+    private String email;
+    private String uid;
 
-    public Mentor(String name, String major, int imageResId) {
+    public Mentor() {}
+
+    public Mentor(String name, String department, String email, String uid) {
         this.name = name;
-        this.major = major;
-        this.imageResId = imageResId;
+        this.department = department;
+        this.email = email;
+        this.uid = uid;
     }
 
+    // Getters
     public String getName() { return name; }
-    public String getMajor() { return major; }
-    public int getImageResId() { return imageResId; }
+    public String getDepartment() { return department; }
+    public String getEmail() { return email; }
+    public String getUid() { return uid; }
 }

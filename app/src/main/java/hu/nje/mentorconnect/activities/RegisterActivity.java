@@ -199,16 +199,26 @@ public class RegisterActivity extends AppCompatActivity {
                                         newMentee.put("email", email);
                                         newMentee.put("uid", uid);
 
+                                        // 1. Add mentee under mentor
                                         db.collection("users")
                                                 .document(selectedMentorUID)
                                                 .update("mentees", FieldValue.arrayUnion(newMentee))
                                                 .addOnSuccessListener(aVoid -> {
-                                                    Toast.makeText(this, "Mentee linked to mentor successfully!", Toast.LENGTH_SHORT).show();
-                                                    startActivity(new Intent(this, LoginActivity.class));
-                                                    finish();
+                                                    // 2. Store mentor UID inside mentee document
+                                                    db.collection("users")
+                                                            .document(uid)
+                                                            .update("assignedMentorId", selectedMentorUID)
+                                                            .addOnSuccessListener(done -> {
+                                                                Toast.makeText(this, "Mentee linked and mentor ID saved!", Toast.LENGTH_SHORT).show();
+                                                                startActivity(new Intent(this, LoginActivity.class));
+                                                                finish();
+                                                            })
+                                                            .addOnFailureListener(e -> {
+                                                                Toast.makeText(this, "Failed to save mentor ID to mentee", Toast.LENGTH_SHORT).show();
+                                                            });
                                                 })
                                                 .addOnFailureListener(e -> {
-                                                    Toast.makeText(this, "Failed to link mentee.", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(this, "Failed to link mentee to mentor", Toast.LENGTH_SHORT).show();
                                                 });
                                     } else {
                                         Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
