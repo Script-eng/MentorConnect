@@ -67,6 +67,7 @@ public class DocsFragment extends Fragment
     private DocumentAdapter documentAdapter;
     private List<Document> documentList;
     private TextView generalInfoTextView;
+    private boolean isMentor = false;
     private Button uploadButton;
     private Uri selectedFileUri;
 
@@ -90,33 +91,41 @@ public class DocsFragment extends Fragment
         documentsRecyclerView = view.findViewById(R.id.documents_recycler_view);
         generalInfoTextView = view.findViewById(R.id.general_info_text);
         uploadButton = view.findViewById(R.id.upload_button);
-        uploadButton.setVisibility(View.GONE);
         documentTitleInput = view.findViewById(R.id.document_title_input);
+        uploadButton.setVisibility(View.GONE);
 
         documentList = new ArrayList<>();
-        documentAdapter = new DocumentAdapter(
-                documentList,
-                this,
-                this);
-        documentsRecyclerView.setAdapter(documentAdapter);
-
         documentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        documentsRecyclerView.setAdapter(documentAdapter);
 
+        // 🔧 Initialize Firebase instances FIRST
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser != null) {
             db.collection("users").document(currentUser.getUid()).get()
                     .addOnSuccessListener(doc -> {
-                        if (doc.exists() && "Mentor".equalsIgnoreCase(doc.getString("role"))) {
+                        boolean isMentor = doc.exists() && "Mentor".equalsIgnoreCase(doc.getString("role"));
+
+                        if (isMentor) {
                             uploadButton.setVisibility(View.VISIBLE);
                             uploadButton.setOnClickListener(v -> openFilePicker());
                         }
-                    });
-        }
 
-        loadDocuments();
+                        documentAdapter = new DocumentAdapter(documentList, this, this, isMentor);
+                        documentsRecyclerView.setAdapter(documentAdapter);
+                        loadDocuments();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Role check failed", e);
+                        documentAdapter = new DocumentAdapter(documentList, this, this, false);
+                        documentsRecyclerView.setAdapter(documentAdapter);
+                        loadDocuments();
+                    });
+        } else {
+            documentAdapter = new DocumentAdapter(documentList, this, this, false);
+            documentsRecyclerView.setAdapter(documentAdapter);
+            loadDocuments();
+        }
     }
 
     private void openFilePicker() {

@@ -16,6 +16,9 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
     private final List<Document> documentList;
     private final OnDownloadClickListener downloadClickListener;
     private final OnDeleteClickListener   deleteClickListener;
+    //Adding the Mentor Bool that we can control the delete button
+    private final boolean isMentor;
+
 
     public interface OnDownloadClickListener {
         void onDownloadClick(Document document);
@@ -29,11 +32,13 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
     public DocumentAdapter(
             List<Document> documentList,
             OnDownloadClickListener downloadClickListener,
-            OnDeleteClickListener   deleteClickListener
+            OnDeleteClickListener   deleteClickListener,
+             boolean isMentor
     ) {
         this.documentList        = documentList;
         this.downloadClickListener = downloadClickListener;
         this.deleteClickListener   = deleteClickListener;
+        this.isMentor = isMentor;
     }
 
     @NonNull
@@ -53,9 +58,14 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
                 downloadClickListener.onDownloadClick(doc)
         );
 
-        holder.deleteButton.setOnClickListener(v ->
-                deleteClickListener.onDeleteClick(doc)
-        );
+        if (isMentor) {
+            holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setOnClickListener(v ->
+                    deleteClickListener.onDeleteClick(doc)
+            );
+        } else {
+            holder.deleteButton.setVisibility(View.GONE);
+        }
     }
 
     @Override
