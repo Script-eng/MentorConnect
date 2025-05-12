@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/meeting_fragment_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@drawable/login_gradient">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/meeting_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Scheduled Meetings"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- RecyclerView to list meetings -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_meetings"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="72dp"
+        app:layout_constraintTop_toBottomOf="@id/meeting_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- TextView for empty state -->
+    <TextView
+        android:id="@+id/empty_meeting_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No meetings scheduled yet."
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/meeting_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Add Meeting FAB (visible only to mentors) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_meeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:contentDescription="Add Meeting"
+        app:tint="@android:color/white"
+        android:visibility="gone"
+        app:elevation="2dp"
+        android:backgroundTint="@color/lightPurple"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_margin="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import hu.nje.mentorconnect.MainActivity;
 import hu.nje.mentorconnect.R;
+import hu.nje.mentorconnect.fragments.ForgotPasswordDialogFragment;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -32,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
         signInButton = findViewById(R.id.register_button);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+
 
         signInButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
@@ -75,6 +78,13 @@ public class LoginActivity extends AppCompatActivity {
         TextView textRegister = findViewById(R.id.text_register);
         textRegister.setOnClickListener(v ->{
             startActivity(new Intent(this, RegisterActivity.class));
+        });
+
+
+        TextView recoverPasswordText = findViewById(R.id.text_recover);
+        recoverPasswordText.setOnClickListener(v -> {
+            ForgotPasswordDialogFragment dialog = new ForgotPasswordDialogFragment();
+            dialog.show(getSupportFragmentManager(), "ForgotPasswordDialog");
         });
     }
 

@@ -6,12 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -72,6 +75,17 @@ public class HomeFragment extends Fragment {
         cardDocs.setOnClickListener(v -> {
             navigateToFragment(new DocsFragment(), R.id.nav_documents);
         });
+
+        MaterialCardView scheduleMeetingCard = view.findViewById(R.id.card_schedule_meeting);
+        scheduleMeetingCard.setOnClickListener(v -> {
+            Fragment scheduleFragment = new ScheduleMeetingFragment();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, scheduleFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
     }
 
     private void navigateToFragment(Fragment fragment, int menuItemId) {

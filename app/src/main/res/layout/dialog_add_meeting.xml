@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="500dp"
+    android:minWidth="300dp"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Meeting Title Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_layout_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_meeting_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Meeting Title" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Date Picker -->
+    <TextView
+        android:id="@+id/text_date_picker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Select Date and Time"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:background="@android:color/darker_gray"
+        android:padding="12dp"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/input_layout_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Location Picker -->
+    <TextView
+        android:id="@+id/text_location_picker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Pick Location on Map"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:background="@android:color/darker_gray"
+        android:padding="12dp"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/text_date_picker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Purpose -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_layout_purpose"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/text_location_picker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_meeting_purpose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Purpose" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/button_save_meeting"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Save Meeting"
+        app:layout_constraintTop_toBottomOf="@id/input_layout_purpose"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

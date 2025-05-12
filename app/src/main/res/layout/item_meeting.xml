@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:backgroundTint="@android:color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/meeting_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Meeting Title"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/meeting_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Date: June 1, 2025"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/meeting_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="4dp" />
+
+        <!-- Location -->
+        <TextView
+            android:id="@+id/meeting_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Location: Room A1"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/meeting_date"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="4dp" />
+
+        <!-- Purpose -->
+        <TextView
+            android:id="@+id/meeting_purpose"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Purpose: Feedback session"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/meeting_location"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="4dp" />
+
+        <!-- Edit Button (Mentor only) -->
+        <ImageButton
+            android:id="@+id/meeting_edit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_edit"
+            android:contentDescription="Edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@android:color/holo_blue_dark"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/meeting_purpose"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="8dp" />
+
+        <!-- Delete Button (Mentor only) -->
+        <ImageButton
+            android:id="@+id/meeting_delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_delete"
+            android:contentDescription="Delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@android:color/holo_red_dark"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/meeting_purpose"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
